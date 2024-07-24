@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --primary: #4288f6;
+    --primary-border: #2a6edb;
+    --accent: #29b047;
+    --text: #08384d;
+    --heading: #062330;
+    --yellow: #e8c827;
+    --heading2: #0c445b;
+
+    --blue-green-gradient: linear-gradient(240deg, #d9e7ff 0%, #e1fce7 100%);
+}
+
+html,
+body {
+    width: 100%;
+    margin: 0;
+    padding-left: 2px;
+    padding-right: 2px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#wrapper {
+    width: 100%;
+    transform-origin: 0 0;
+}
+
+*,
+*::before,
+*::after {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    color: var(--text);
+}
+
+/* text */
+h1,
+h3 {
+    color: var(--heading2);
+}
+h1 {
+    font-weight: 800;
+    font-size: 4rem;
+    line-height: 1.1;
+}
+p {
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text);
+    opacity: 0.7;
+}
+h3 {
+    font-weight: 600;
+    line-height: 1.2;
+    font-size: 1rem;
+}
+
+.subtext {
+    font-size: 0.75rem;
+    line-height: 1;
+    color: #08384d;
+    font-weight: 500;
+}
+
+/* buttons  */
+button {
+    display: flex;
+    flex-direction: row;
+    gap: 0.625rem;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding-block: 0.75rem;
+    padding-inline: 1rem;
+    border-radius: 0.625rem;
+
+    /* font */
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 1.2;
+}
