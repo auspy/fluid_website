@@ -7,7 +7,7 @@ export default function Hero() {
   const isDesktop = screenWidth > 1100;
   const isMobile = screenWidth < 760;
 
-  const MAX_ZOOM = isMobile ? 1.5 : 5.0;
+  const MAX_ZOOM = isMobile ? 1.5 : 4.0;
   const calculateDistance = (touches) => {
     const dx = touches[0].pageX - touches[1].pageX;
     const dy = touches[0].pageY - touches[1].pageY;
