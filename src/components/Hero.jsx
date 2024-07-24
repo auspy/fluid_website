@@ -7,7 +7,7 @@ export default function Hero() {
   const isDesktop = screenWidth > 1100;
   const isMobile = screenWidth < 760;
 
-  const MAX_ZOOM = isMobile ? 2.0 : 5.0;
+  const MAX_ZOOM = isMobile ? 1.5 : 5.0;
   const calculateDistance = (touches) => {
     const dx = touches[0].pageX - touches[1].pageX;
     const dy = touches[0].pageY - touches[1].pageY;
@@ -17,74 +17,101 @@ export default function Hero() {
     return isDesktop ? 120 : isMobile ? 20 : 30;
   };
   const resetOnResize = () => {
-    // reset padding of wrapper
+    const newZoomFactor = 1.0;
+    setZoomFactor(newZoomFactor);
     const wrapper = document.getElementById("wrapper");
-    if (wrapper) {
-      const existingPadding = wrapper.style.paddingInline;
-      const correctPadding = paddingValue();
-      if (existingPadding !== `${correctPadding}px`) {
-        wrapper.style.paddingInline = `${correctPadding}px`;
-      }
-    }
+    wrapper.style.transform = `scale(${newZoomFactor})`;
+    wrapper.style.width = `${100 / newZoomFactor}%`;
+    handleHeroOnZoom(1);
 
-    // reset height of hero images based on h-[400px] sm:h-[500px] md:h-[524px]
-    const heroImage = document.getElementById("hero-images");
-    if (heroImage) {
-      if (isMobile) {
-        heroImage.style.height = "400px";
-      } else {
-        heroImage.style.height = "520px";
-      }
-    }
+    // reset padding of wrapper
+    // const wrapper = document.getElementById("wrapper");
+    // if (wrapper) {
+    //   const existingPadding = wrapper.style.paddingInline;
+    //   const correctPadding = paddingValue();
+    //   if (existingPadding !== `${correctPadding}px`) {
+    //     wrapper.style.paddingInline = `${correctPadding}px`;
+    //   }
+    // }
+
+    // // reset height of hero images based on h-[400px] sm:h-[500px] md:h-[524px]
+    // const heroImage = document.getElementById("hero-images");
+    // if (heroImage) {
+    //   if (isMobile) {
+    //     heroImage.style.height = "400px";
+    //   } else {
+    //     heroImage.style.height = "520px";
+    //   }
+    // }
   };
 
-  const handleHeroOnZoom = () => {
+  const handleHeroOnZoom = (zoom) => {
+    const zoomIs = zoom || zoomFactor;
     // switch from flex row to flex column when zoom is above 1.
     const heroGrid = document.getElementById("hero-container");
     const wrapper = document.getElementById("wrapper");
     if (!wrapper) return;
     if (!heroGrid) return;
-    if (zoomFactor > 1.02) {
+    if (zoomIs > 1.02) {
       heroGrid.classList.remove("xl:flex-row");
     } else {
       heroGrid.classList.add("xl:flex-row");
     }
     // reduce padding as the size of the hero increases
-    const padding = paddingValue() - zoomFactor * 50;
-    if (isDesktop) {
-      if (padding > 30) wrapper.style.padding = `${padding}px`;
-      // adjust width of hero heading between 1 and 1.2 zoom
-      const heading = document.querySelector("#hero-container  h1");
-      if (heading)
-        if (zoomFactor > 1.05 && zoomFactor < 1.2) {
-          heading.style.width = `${(76 / 100) * 1200}px`;
-        } else {
-          heading.style.width = "100%";
-        }
+    const padding = paddingValue() - zoomIs * 50;
+    if (zoomIs === 1) wrapper.style.padding = `${paddingValue()}px`;
+    else {
+      if (isDesktop) {
+        if (padding > 30) wrapper.style.padding = `${padding}px`;
+        // adjust width of hero heading between 1 and 1.2 zoomIs
+        const heading = document.querySelector("#hero-container  h1");
+        if (heading)
+          if (zoomIs > 1.05 && zoomIs < 1.2) {
+            heading.style.width = `${(76 / 100) * 1200}px`;
+          } else {
+            heading.style.width = "100%";
+          }
+      }
     }
 
     // reduce hero image height as zoom increases
     const heroImage = document.getElementById("hero-images");
     if (heroImage)
-      heroImage.style.height = `${((!isMobile ? 600 : 400) / 100) * (100 - zoomFactor * 10)}px`;
+      heroImage.style.height = `${((!isMobile ? 600 : 400) / 100) * (100 - zoomIs * 10)}px`;
 
     // change flex direction of button container when zoom is above 1
     const buttonContainer = document.getElementById("hero-buttons");
     if (buttonContainer) {
       if (!isMobile && !isDesktop) {
         // normal css: flex-col md:flex-row
-        if (zoomFactor > 1.5) {
+        if (zoomIs > 1.5) {
           buttonContainer.classList.remove("md:flex-row");
         } else {
           buttonContainer.classList.add("md:flex-row");
         }
       } else {
         if (isDesktop) {
-          if (zoomFactor > 1.75) {
+          if (zoomIs > 1.75) {
             buttonContainer.classList.remove("md:flex-row");
           } else {
             buttonContainer.classList.add("md:flex-row");
           }
+        }
+      }
+    }
+
+    // adjust hero button flex direction when zoom is above 1.5
+    const heroBtn = document.getElementsByClassName("hero-button");
+    if (heroBtn) {
+      if (isMobile) {
+        if (zoomIs > 1.5) {
+          Array.from(heroBtn).forEach((btn) => {
+            btn.classList.add("flex-col");
+          });
+        } else {
+          Array.from(heroBtn).forEach((btn) => {
+            btn.classList.remove("flex-col");
+          });
         }
       }
     }
@@ -113,14 +140,14 @@ export default function Hero() {
   const handleZoom = throttle((direction, rate, e) => {
     e.preventDefault();
     console.log("zooming");
-
-    if (zoomFactor <= 1.0 && direction === "out") {
+    // move in if direction is 1, move out if direction is 0
+    if (zoomFactor <= 1.0 && direction === 0) {
       return;
     }
-    if (zoomFactor >= MAX_ZOOM && direction === "in") {
+    if (zoomFactor >= MAX_ZOOM && direction === 1) {
       return;
     }
-    let newZoomFactor = zoomFactor + (direction === "in" ? rate : -rate);
+    let newZoomFactor = zoomFactor + (direction === 1 ? rate : -rate);
     newZoomFactor = Math.max(newZoomFactor, rate);
 
     // const adjustedZoomFactor =
@@ -129,13 +156,13 @@ export default function Hero() {
     const wrapper = document.getElementById("wrapper");
     wrapper.style.transform = `scale(${newZoomFactor})`;
     wrapper.style.width = `${100 / newZoomFactor}%`;
-    handleHeroOnZoom(direction, rate, e);
+    handleHeroOnZoom();
   }, 100);
 
   useEffect(() => {
     const handleWheel = (e) => {
       if (e.ctrlKey) {
-        handleZoom(e.deltaY < 0 ? "in" : "out", 0.02, e);
+        handleZoom(e.deltaY < 0 ? 1 : 0, 0.02, e);
       }
     };
 
@@ -148,7 +175,7 @@ export default function Hero() {
     const handleTouchMove = (e) => {
       if (e.touches.length === 2) {
         const currentDistance = calculateDistance(e.touches);
-        handleZoom(currentDistance > initialDistance ? "in" : "out", 0.01, e);
+        handleZoom(currentDistance > initialDistance ? 1 : 0, 0.01, e);
         setInitialDistance(currentDistance);
       }
     };
@@ -164,7 +191,7 @@ export default function Hero() {
       document.removeEventListener("touchstart", handleTouchStart);
       document.removeEventListener("touchmove", handleTouchMove);
     };
-  }, [zoomFactor, initialDistance, screenWidth]);
+  }, [zoomFactor, initialDistance]);
 
   // set screen width on resize
   useEffect(() => {
@@ -200,7 +227,7 @@ export default function Hero() {
         <div className="flex-1 gap-8 flex flex-col items-start ">
           <div className="flex flex-col items-start gap-6">
             {/* tag */}
-            <div className="flex items-center gap-2 uppercase text-xs leading-3 font-bold  px-4 py-2 rounded-[20px] bg-bg border border-bg-border">
+            <div className="flex items-center gap-2 uppercase text-xs leading-3 font-bold  w-full md:w-fit px-2 md:px-4 py-2 rounded-[20px] bg-bg border border-bg-border">
               <img
                 src="/icons/trophy.png"
                 alt="trophy icons"
@@ -333,7 +360,7 @@ const PrimaryButton = ({
   return (
     <div className="flex items-start flex-col gap-2 w-full">
       <button
-        className={`border border-primary-border ${bgColor} capitalize ${className}  `}
+        className={`border text-center hero-button  border-primary-border ${bgColor} capitalize ${className}  `}
       >
         <img
           src={`/icons/${iconNm}.png`}

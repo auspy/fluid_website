@@ -48,6 +48,11 @@ h1 {
     font-size: 4rem;
     line-height: 1.1;
 }
+@media (max-width: 760px) {
+    h1 {
+        font-size: 3rem;
+    }
+}
 p {
     font-weight: 400;
     font-size: 1rem;
